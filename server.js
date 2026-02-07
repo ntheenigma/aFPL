@@ -75,6 +75,11 @@ function fetchFPL(urlPath) {
   });
 }
 
+// --- Health check (Railway deploy verification) ---
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', uptime: process.uptime() });
+});
+
 // --- API Routes (proxy to FPL with caching) ---
 
 // Bootstrap — all players, teams, gameweeks
@@ -173,6 +178,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`aFPL running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`aFPL running on port ${PORT}`);
 });
