@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="theme-color" content="#37003c">
+  <title>aFPL — Lightweight FPL</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="description" content="Ultra-fast Fantasy Premier League viewer. No lag, no bloat.">
+</head>
+<body>
+  <!-- Top nav -->
+  <header id="header">
+    <div class="header-inner">
+      <h1 class="logo" onclick="router.navigate('/')">aFPL</h1>
+      <div class="team-id-input">
+        <input type="text" id="teamIdInput" placeholder="Team ID" aria-label="Team ID">
+        <button id="teamIdBtn" onclick="loadTeam()">Go</button>
+      </div>
+      <nav id="mainNav">
+        <button class="nav-btn active" data-view="pitch" onclick="switchView('pitch')">My Team</button>
+        <button class="nav-btn" data-view="points" onclick="switchView('points')">Points</button>
+        <button class="nav-btn" data-view="players" onclick="switchView('players')">Players</button>
+        <button class="nav-btn" data-view="fixtures" onclick="switchView('fixtures')">Fixtures</button>
+        <button class="nav-btn" data-view="leagues" onclick="switchView('leagues')">Leagues</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Gameweek selector -->
+  <div id="gwBar" class="gw-bar hidden">
+    <button onclick="changeGW(-1)" class="gw-arrow">&larr;</button>
+    <span id="gwLabel">Gameweek 1</span>
+    <button onclick="changeGW(1)" class="gw-arrow">&rarr;</button>
+    <div id="gwMeta" class="gw-meta"></div>
+  </div>
+
+  <!-- Main content area -->
+  <main id="app">
+    <!-- Landing -->
+    <section id="landing" class="view active">
+      <div class="landing-card">
+        <h2>Welcome to aFPL</h2>
+        <p>A lightning-fast Fantasy Premier League viewer.</p>
+        <p>Enter your FPL Team ID above to get started.</p>
+        <div class="landing-hint">
+          <strong>How to find your Team ID:</strong><br>
+          Go to fantasy.premierleague.com &rarr; My Team &rarr; check the URL.<br>
+          It's the number in <code>/entry/<strong>XXXXXX</strong>/event/...</code>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pitch view (My Team) -->
+    <section id="pitchView" class="view">
+      <div class="team-header">
+        <h2 id="teamName"></h2>
+        <div id="teamMeta" class="team-meta"></div>
+      </div>
+      <div id="pitch" class="pitch">
+        <div class="pitch-row" id="row-GKP"></div>
+        <div class="pitch-row" id="row-DEF"></div>
+        <div class="pitch-row" id="row-MID"></div>
+        <div class="pitch-row" id="row-FWD"></div>
+      </div>
+      <div id="bench" class="bench">
+        <h3>Bench</h3>
+        <div id="benchPlayers" class="bench-players"></div>
+      </div>
+    </section>
+
+    <!-- Points view -->
+    <section id="pointsView" class="view">
+      <div id="pointsSummary" class="points-summary"></div>
+      <table id="pointsTable" class="data-table">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Pos</th>
+            <th>Pts</th>
+            <th>Minutes</th>
+            <th>Goals</th>
+            <th>Assists</th>
+            <th>CS</th>
+            <th>BPS</th>
+          </tr>
+        </thead>
+        <tbody id="pointsBody"></tbody>
+      </table>
+    </section>
+
+    <!-- Players view -->
+    <section id="playersView" class="view">
+      <div class="players-controls">
+        <input type="text" id="playerSearch" placeholder="Search players..." class="player-search">
+        <select id="playerPosFilter" class="player-filter">
+          <option value="0">All Positions</option>
+          <option value="1">GKP</option>
+          <option value="2">DEF</option>
+          <option value="3">MID</option>
+          <option value="4">FWD</option>
+        </select>
+        <select id="playerSort" class="player-filter">
+          <option value="total_points">Total Points</option>
+          <option value="now_cost">Price</option>
+          <option value="goals_scored">Goals</option>
+          <option value="assists">Assists</option>
+          <option value="minutes">Minutes</option>
+          <option value="selected_by_percent">Ownership %</option>
+          <option value="form">Form</option>
+          <option value="points_per_game">PPG</option>
+          <option value="ict_index">ICT Index</option>
+        </select>
+      </div>
+      <table class="data-table" id="playersTable">
+        <thead>
+          <tr>
+            <th class="sortable" data-sort="web_name">Player</th>
+            <th class="sortable" data-sort="team">Team</th>
+            <th>Pos</th>
+            <th class="sortable" data-sort="now_cost">Price</th>
+            <th class="sortable" data-sort="total_points">Pts</th>
+            <th class="sortable" data-sort="form">Form</th>
+            <th class="sortable" data-sort="selected_by_percent">Own%</th>
+            <th class="sortable" data-sort="points_per_game">PPG</th>
+          </tr>
+        </thead>
+        <tbody id="playersBody"></tbody>
+      </table>
+      <div id="playersLoadMore" class="load-more">
+        <button onclick="loadMorePlayers()">Load More</button>
+      </div>
+    </section>
+
+    <!-- Fixtures view -->
+    <section id="fixturesView" class="view">
+      <div id="fixturesList" class="fixtures-list"></div>
+    </section>
+
+    <!-- Leagues view -->
+    <section id="leaguesView" class="view">
+      <div id="leaguesList" class="leagues-list"></div>
+      <div id="leagueStandings" class="league-standings hidden"></div>
+    </section>
+
+    <!-- Player detail modal -->
+    <div id="playerModal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <div id="playerDetail"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Loading spinner -->
+  <div id="loader" class="loader hidden">
+    <div class="spinner"></div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
