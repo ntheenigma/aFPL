@@ -1,0 +1,27 @@
+{
+  "appId": "com.afpl.app",
+  "appName": "aFPL",
+  "webDir": "public",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "allowsLinkPreview": false,
+    "scrollEnabled": true,
+    "backgroundColor": "#37003c"
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "LIGHT",
+      "backgroundColor": "#37003c"
+    },
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "launchShowDuration": 500,
+      "backgroundColor": "#37003c",
+      "showSpinner": false
+    }
+  }
+}

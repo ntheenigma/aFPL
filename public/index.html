@@ -2,11 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#37003c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>aFPL — Lightweight FPL</title>
   <link rel="stylesheet" href="/style.css">
   <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.svg">
   <meta name="description" content="Ultra-fast Fantasy Premier League viewer. No lag, no bloat.">
 </head>
 <body>
@@ -158,6 +161,15 @@
     <div class="spinner"></div>
   </div>
 
+  <!-- Capacitor native bridge (no-op on web, loads on native) -->
+  <script>
+    // Set your deployed Railway backend URL here for native iOS builds.
+    // On web this stays empty so API calls use the same origin.
+    // Example: window.AFPL_API_BASE = 'https://afpl-production.up.railway.app';
+    if (window.Capacitor) {
+      window.AFPL_API_BASE = window.AFPL_API_BASE || 'YOUR_RAILWAY_URL';
+    }
+  </script>
   <script src="/app.js"></script>
 </body>
 </html>

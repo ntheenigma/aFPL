@@ -45,6 +45,11 @@ const teamColors = {
 
 const posNames = { 1: 'GKP', 2: 'DEF', 3: 'MID', 4: 'FWD' };
 
+// --- API Base ---
+// When running as a native Capacitor app, point to deployed backend.
+// Set window.AFPL_API_BASE before app.js loads, or it defaults to '' (same origin).
+const API_BASE = window.AFPL_API_BASE || '';
+
 // --- Utility Functions ---
 function $(sel) { return document.querySelector(sel); }
 function $$(sel) { return document.querySelectorAll(sel); }
@@ -53,7 +58,7 @@ function showLoader() { $('#loader').classList.remove('hidden'); }
 function hideLoader() { $('#loader').classList.add('hidden'); }
 
 async function api(path) {
-  const res = await fetch(`/api${path}`);
+  const res = await fetch(`${API_BASE}/api${path}`);
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return res.json();
 }

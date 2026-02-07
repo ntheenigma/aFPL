@@ -9,6 +9,17 @@ const PORT = process.env.PORT || 3000;
 // Gzip everything
 app.use(compression());
 
+// CORS — allows Capacitor native apps (capacitor://localhost, https://localhost) to hit this API
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && (origin.includes('localhost') || origin.includes('capacitor'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  next();
+});
+
 // Static files with aggressive caching
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '1h',
